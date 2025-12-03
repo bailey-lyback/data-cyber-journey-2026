@@ -2,6 +2,8 @@ import collections
 from pathlib import Path
 
 LOG_PATH = Path(__file__).resolve().parents[2] / "data" / "auth_log_sample.txt"
+THRESHOLD = 3  # number of failed logins before we flag an IP as suspicious
+
 
 def parse_failed_logins(path: Path):
     failed_by_ip = collections.Counter()
@@ -43,6 +45,15 @@ def main():
     for user, count in failed_by_user.most_common():
         print(f"  {user:15} {count}")
 
+    print(f"\nSuspicious IPs with more than {THRESHOLD} failed attempts:")
+    suspicious = [ip for ip, count in failed_by_ip.items() if count > THRESHOLD]
+    if not suspicious:
+        print("  None")
+    else:
+        for ip in suspicious:
+            print(f"  {ip}")
+
 
 if __name__ == "__main__":
     main()
+
